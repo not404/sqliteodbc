@@ -10,7 +10,7 @@
 
 set -e
 
-VER3=3.6.23.1
+VER3=3.7.0.1
 
 if test -n "$SQLITE_DLLS" ; then
     export ADD_CFLAGS="-DWITHOUT_SHELL=1 -DWITH_SQLITE_DLLS=1"
@@ -220,7 +220,7 @@ EOD
 test "$VER3" != "3.6.15" -a "$VER3" != "3.6.16" -a "$VER3" != "3.6.17" \
   -a "$VER3" != "3.6.18" -a "$VER3" != "3.6.19" -a "$VER3" != "3.6.20" \
   -a "$VER3" != "3.6.21" -a "$VER3" != "3.6.22" -a "$VER3" != "3.6.23" \
-  -a "$VER3" != "3.6.23.1" \
+  -a "$VER3" != "3.6.23.1" -a "$VER3" != "3.7.0.1" \
   && patch -d sqlite3 -p1 <<'EOD'
 diff -u sqlite3.orig/src/build.c sqlite3/src/build.c
 --- sqlite3.orig/src/build.c	2007-01-09 14:53:04.000000000 +0100
@@ -404,12 +404,12 @@ patch -d sqlite3 -p1 <<'EOD'
 @@ -981,7 +981,18 @@
      }else{
        error = GetLastError();
-       OSTRACE2("error-code = %d\n", error);
+       OSTRACE(("error-code = %d\n", error));
 -      getReadLock(pFile);
 +      if( !getReadLock(pFile) ){
 +        /* This should never happen.  We should always be able to
 +        ** reacquire the read lock */
-+        OSTRACE1("could not re-get a SHARED lock.\n");
++        OSTRACE("could not re-get a SHARED lock.\n");
 +        if( newLocktype==PENDING_LOCK || pFile->locktype==PENDING_LOCK ){
 +          UnlockFile(pFile->h, PENDING_BYTE, 0, 1, 0);
 +        }
@@ -433,7 +433,7 @@ EOD
 
 # patch: compile fix for FTS3 as extension module
 test "$VER3" != "3.6.21" -a "$VER3" != "3.6.22" -a "$VER3" != "3.6.23" \
-  -a "$VER3" != "3.6.23.1" \
+  -a "$VER3" != "3.6.23.1" -a "$VER3" != "3.7.0.1" \
   && patch -d sqlite3 -p1 <<'EOD'
 --- sqlite3.orig/ext/fts3/fts3.c 2008-02-02 17:24:34.000000000 +0100
 +++ sqlite3/ext/fts3/fts3.c      2008-03-16 11:29:02.000000000 +0100
@@ -512,7 +512,7 @@ test "$VER3" != "3.6.21" -a "$VER3" != "3.6.22" -a "$VER3" != "3.6.23" \
  #include "fts3_hash.h"
 EOD
 test "$VER3" = "3.6.21" -o "$VER3" = "3.6.22" -o "$VER3" = "3.6.23" \
-  -o "$VER3" = "3.6.23.1" \
+  -o "$VER3" = "3.6.23.1" -o "$VER3" = "3.7.0.1" \
   && patch -d sqlite3 -p1 <<'EOD'
 --- sqlite3.orig/ext/fts3/fts3.c 2008-02-02 17:24:34.000000000 +0100
 +++ sqlite3/ext/fts3/fts3.c      2008-03-16 11:29:02.000000000 +0100
@@ -596,7 +596,7 @@ test "$VER3" = "3.6.21" && patch -d sqlite3 -p1 <<'EOD'
  #include <assert.h>
  #include <stdlib.h>
 EOD
-test "$VER3" = "3.6.22" -o "$VER3" = "3.6.23" -o "$VER3" = "3.6.23.1" \
+test "$VER3" = "3.6.22" -o "$VER3" = "3.6.23" -o "$VER3" = "3.6.23.1" -o "$VER3" = "3.7.0.1" \
   && patch -d sqlite3 -p1 <<'EOD'
 --- sqlite3.orig/ext/fts3/fts3_write.c   2010-01-05 09:42:19.000000000 +0100
 +++ sqlite3/ext/fts3/fts3_write.c        2010-01-05 09:55:25.000000000 +0100
@@ -635,7 +635,7 @@ test "$VER3" = "3.6.22" -o "$VER3" = "3.6.23" -o "$VER3" = "3.6.23.1" \
  #endif
 EOD
 test "$VER3" = "3.6.21" -o "$VER3" = "3.6.22" -o "$VER3" = "3.6.23" \
-  -o "$VER3" = "3.6.23.1" \
+  -o "$VER3" = "3.6.23.1" -o "$VER3" = "3.7.0.1" \
   && patch -d sqlite3 -p1 <<'EOD'
 --- sqlite3.orig/ext/fts3/fts3_snippet.c 2009-12-03 12:33:32.000000000 +0100
 +++ sqlite3/ext/fts3/fts3_snippet.c      2010-01-05 08:03:51.000000000 +0100
